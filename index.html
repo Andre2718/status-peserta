@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+</head>
+
+
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-800 to-green-600">
+
+    <form onsubmit="doLogin(event)" class="bg-white p-8 rounded-xl shadow-xl w-full max-w-sm">
+
+        <h2 class="text-xl font-bold text-center mb-6">Login</h2>
+
+        <!-- USERNAME -->
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">Username</label>
+            <input id="username" type="text" required class="w-full border rounded-lg px-4 py-2"
+                placeholder="Masukkan username Anda" />
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="mb-6">
+            <label class="block text-sm font-semibold mb-1">Password</label>
+            <input id="password" type="password" required class="w-full border rounded-lg px-4 py-2"
+                placeholder="Masukkan password Anda" />
+        </div>
+
+        <!-- INI TAMBAHAN BARU -->
+        <p id="loginError" class="text-sm text-red-600 hidden">
+            Username atau password tidak valid.
+        </p>
+
+        <!-- BUTTON LOGIN + LOADER -->
+        <button id="loginBtn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold
+             flex items-center justify-center gap-2">
+
+            <span id="loginText">Login</span>
+
+            <svg id="loginLoader" class="w-5 h-5 animate-spin hidden" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="4" opacity="0.25" />
+                <path fill="white" opacity="0.75" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+            </svg>
+
+        </button>
+
+    </form>
+
+    <script>
+        const SUPABASE_URL = "https://aaaecuwryjnfbchxnqpe.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable__2jPOraYn_nromj-eWOtCQ_CvvAF-c6";
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function setLoading(state) {
+            const btn = document.getElementById("loginBtn");
+            const text = document.getElementById("loginText");
+            const loader = document.getElementById("loginLoader");
+
+            btn.disabled = state;
+            text.textContent = state ? "Memproses..." : "Login";
+            loader.classList.toggle("hidden", !state);
+        }
+
+        async function doLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const errorText = document.getElementById("loginError");
+
+            errorText.classList.add("hidden");
+
+            if (!email || !password) {
+                errorText.textContent = "Username dan password wajib diisi.";
+                errorText.classList.remove("hidden");
+                return;
+            }
+
+            setLoading(true);
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                errorText.textContent = "Username atau password tidak valid.";
+                errorText.classList.remove("hidden");
+                setLoading(false);
+                return;
+            }
+
+            // 🔥 Cek role dari metadata user
+            const role = data.user.user_metadata.role || "PETUGAS";
+
+            localStorage.setItem("role", role);
+
+            if (role === "ADMIN") {
+                window.location.href = "admin.html";
+            } else {
+                window.location.href = "dashboard.html";
+            }
+        }
+
+        document.getElementById("password").addEventListener("input", () => {
+            document.getElementById("loginError").classList.add("hidden");
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

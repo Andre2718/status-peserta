@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Status Peserta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+</head>
+
+<body class="min-h-screen bg-gradient-to-r from-blue-800 to-green-600">
+
+    <!-- HEADER -->
+    <div class="bg-gradient-to-r from-blue-800 to-green-600 py-6 relative">
+
+        <div class="absolute left-6 top-6">
+            <button onclick="history.back()"
+                class="bg-green-500 text-white px-5 py-2 rounded-lg font-semibold shadow">
+                ← Kembali
+            </button>
+        </div>
+
+        <h1 class="text-center text-white text-xl font-semibold">
+            Status Peserta
+        </h1>
+
+        <div class="absolute right-6 top-6">
+            <button onclick="menuUtama()"
+                class="bg-green-500 text-white px-5 py-2 rounded-lg font-semibold shadow">
+                Menu Utama
+            </button>
+        </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="flex items-center justify-center mt-10 px-4">
+        <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-8">
+
+            <form class="space-y-5" onsubmit="submitForm(event)">
+
+                <!-- Kab/Kota -->
+                <div>
+                    <label class="block text-sm font-semibold mb-1">
+                        Kab / Kota (Opsional)
+                    </label>
+                    <select id="kabkota" class="w-full border rounded-lg px-4 py-2">
+                        <option value="">-- Semua Wilayah --</option>
+                        <option>Kota Tasikmalaya</option>
+                        <option>Kabupaten Tasikmalaya</option>
+                        <option>Kabupaten Garut</option>
+                    </select>
+                </div>
+
+                <!-- NIK -->
+                <div>
+                    <label class="block text-sm font-semibold mb-1">
+                        NIK / KK *
+                    </label>
+                    <input id="nik" type="text"
+                        class="w-full border rounded-lg px-4 py-3 text-lg"
+                        placeholder="Masukkan 16 digit">
+                </div>
+
+                <!-- KEYPAD -->
+                <div class="grid grid-cols-3 gap-4 mt-6 max-w-md mx-auto">
+
+                    <button type="button" onclick="add('1')" class="keypad">1</button>
+                    <button type="button" onclick="add('2')" class="keypad">2</button>
+                    <button type="button" onclick="add('3')" class="keypad">3</button>
+
+                    <button type="button" onclick="add('4')" class="keypad">4</button>
+                    <button type="button" onclick="add('5')" class="keypad">5</button>
+                    <button type="button" onclick="add('6')" class="keypad">6</button>
+
+                    <button type="button" onclick="add('7')" class="keypad">7</button>
+                    <button type="button" onclick="add('8')" class="keypad">8</button>
+                    <button type="button" onclick="add('9')" class="keypad">9</button>
+
+                    <button type="button" onclick="resetNik()" class="keypad bg-gray-200">
+                        Reset
+                    </button>
+
+                    <button type="button" onclick="add('0')" class="keypad">0</button>
+
+                    <button type="button" onclick="del()" class="keypad bg-gray-200">
+                        Hapus
+                    </button>
+                </div>
+
+                <!-- SUBMIT -->
+                <button id="submitBtn"
+                    class="w-full py-3 rounded-full bg-blue-600 text-white font-bold mt-6 transition">
+                    Submit
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="errorModal"
+        class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50 transition-opacity duration-300">
+
+        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl p-8 text-center relative animate-fadeIn">
+
+            <!-- ICON X -->
+            <div class="flex justify-center mb-4">
+                <div class="w-20 h-20 rounded-full border-4 border-red-400 flex items-center justify-center">
+                    <span class="text-red-500 text-4xl font-bold">×</span>
+                </div>
+            </div>
+
+            <!-- TEXT -->
+            <p id="modalMessage" class="text-gray-700 text-lg mb-6">
+                Peserta tidak ditemukan
+            </p>
+
+            <!-- BUTTON -->
+            <button onclick="closeModal()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold">
+                OK
+            </button>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const SUPABASE_URL = "https://aaaecuwryjnfbchxnqpe.supabase.co";
+            const SUPABASE_KEY = "sb_publishable__2jPOraYn_nromj-eWOtCQ_CvvAF-c6";
+
+            const { createClient } = supabase;
+            const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            const nikInput = document.getElementById("nik");
+            const kabSelect = document.getElementById("kabkota");
+            const submitBtn = document.getElementById("submitBtn");
+
+            nikInput.addEventListener("input", function () {
+                this.value = this.value.replace(/\D/g, "").slice(0, 16);
+            });
+
+            window.add = function (n) {
+                if (nikInput.value.length < 16) nikInput.value += n;
+            };
+
+            window.del = function () {
+                nikInput.value = nikInput.value.slice(0, -1);
+            };
+
+            window.resetNik = function () {
+                nikInput.value = "";
+            };
+
+            window.submitForm = async function (e) {
+                e.preventDefault();
+
+                const nik = nikInput.value;
+                const kabkota = kabSelect.value;
+
+                if (nik.length !== 16) {
+                    showModal("NIK harus 16 digit");
+                    return;
+                }
+
+                setLoading(true);
+
+                try {
+
+                    let query = supabaseClient
+                        .from("peserta")
+                        .select(`
+                            nama,
+                            segmen,
+                            tgl_nonaktif,
+                            jumlah_bulan_non_aktif,
+                            kelas_1,
+                            kelas_2,
+                            kelas_3
+                        `)
+                        .eq("nik", nik);
+
+                    if (kabkota) {
+                        query = query.eq("kabkota", kabkota);
+                    }
+
+                    const { data, error } = await query;
+
+                    if (error || !data || data.length === 0) {
+                        showModal("Peserta tidak ditemukan atau NIK tidak sesuai");
+                        return;
+                    }
+
+                    localStorage.setItem("hasilPeserta", JSON.stringify(data));
+                    window.location.href = "hasil.html";
+
+                } catch (err) {
+                    showModal("Terjadi kesalahan sistem");
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            function setLoading(state) {
+                submitBtn.disabled = state;
+                submitBtn.innerText = state ? "Memproses..." : "Submit";
+            }
+
+        });
+
+        function showModal(message) {
+            document.getElementById("modalMessage").innerText = message;
+            document.getElementById("errorModal").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("errorModal").classList.add("hidden");
+        }
+
+        function menuUtama() {
+            localStorage.removeItem("hasilPeserta");
+            window.location.href = "dashboard.html";
+        }
+    </script>
+
+    <style>
+        .keypad {
+            border: 2px solid #1e40af;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .keypad:hover {
+            background: #e0f2fe;
+            transform: scale(1.03);
+        }
+
+        @keyframes fadeIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.2s ease-out;
+        }
+    </style>
+
+</body>
+</html>

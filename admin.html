@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Data Peserta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gray-100 p-6">
+
+<script>
+  if (localStorage.getItem("role") !== "ADMIN") {
+    alert("Akses ditolak!");
+    location.href = "index.html";
+  }
+</script>
+
+<h1 class="text-2xl font-bold mb-6">Admin – Kelola Data Peserta</h1>
+
+<!-- FORM TAMBAH DATA -->
+<div class="bg-white p-6 rounded-xl shadow mb-8">
+  <h2 class="font-semibold mb-4">Tambah Data Peserta</h2>
+
+  <div class="grid grid-cols-2 gap-4">
+    <input id="nama" placeholder="Nama" class="border p-2 rounded">
+    <input id="nik" placeholder="NIK" class="border p-2 rounded">
+    <input id="kabkota" placeholder="Kab/Kota" class="border p-2 rounded">
+    <input id="segmen" placeholder="Segmen" class="border p-2 rounded">
+    <input id="bulan" placeholder="Bulan Non Aktif" class="border p-2 rounded">
+    <input id="kelas1" placeholder="Kelas 1" class="border p-2 rounded">
+    <input id="kelas2" placeholder="Kelas 2" class="border p-2 rounded">
+    <input id="kelas3" placeholder="Kelas 3" class="border p-2 rounded">
+  </div>
+
+  <button onclick="tambahData()"
+    class="mt-4 bg-blue-600 text-white px-6 py-2 rounded">
+    Simpan
+  </button>
+</div>
+
+<!-- TABEL DATA -->
+<div class="bg-white p-6 rounded-xl shadow">
+  <h2 class="font-semibold mb-4">Data Peserta</h2>
+  <table class="w-full text-sm border">
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="border p-2">Nama</th>
+        <th class="border p-2">NIK</th>
+        <th class="border p-2">Kab/Kota</th>
+        <th class="border p-2">Bulan</th>
+      </tr>
+    </thead>
+    <tbody id="tabelData"></tbody>
+  </table>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzuEGZMOyrfhTez4y7W8y4EIDUsrs-6ukeiJqRMgPSqSjWKZ9-ZcQK-OAznm83UjzDC5Q/exec";
+
+function tambahData(){
+  const data = {
+    nama: nama.value,
+    nik: nik.value,
+    kabkota: kabkota.value,
+    segmen: segmen.value,
+    bulan: bulan.value,
+    kelas1: kelas1.value,
+    kelas2: kelas2.value,
+    kelas3: kelas3.value
+  };
+
+  fetch(API_URL + "?action=create", {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(r => r.json())
+  .then(res => {
+    alert("Data berhasil ditambahkan");
+    loadData();
+  });
+}
+
+function loadData(){
+  fetch(API_URL + "?action=getAll")
+    .then(r => r.json())
+    .then(res => {
+      const tbody = document.getElementById("tabelData");
+      tbody.innerHTML = "";
+      res.data.forEach(d => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="border p-2">${d.nama}</td>
+            <td class="border p-2">${d.nik}</td>
+            <td class="border p-2">${d.kabkota}</td>
+            <td class="border p-2">${d.bulan}</td>
+          </tr>`;
+      });
+    });
+}
+
+loadData();
+</script>
+
+</body>
+</html>

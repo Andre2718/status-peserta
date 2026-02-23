@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard JKN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gray-100 flex flex-col items-center">
+
+    <!-- LOGO -->
+    <div class="mt-10">
+        <img src="https://amanjkn.bpjs-kesehatan.go.id/images/bpjs-color.svg"
+             alt="BPJS Kesehatan"
+             class="h-20 mx-auto">
+    </div>
+
+    <!-- JUDUL -->
+    <h1 class="text-2xl font-bold text-blue-800 mt-6 text-center">
+        Selamat Datang di Layanan Cek Peserta Non Aktif
+    </h1>
+
+    <p class="text-blue-700 mt-2 text-center">
+        Silahkan Pilih Menu yang Sahabat Butuhkan
+    </p>
+
+    <!-- CARD TUNGGAL -->
+    <div class="flex justify-center w-full mt-12 px-4">
+        <button onclick="goStatus()"
+            class="bg-gradient-to-r from-green-600 to-green-500
+            text-white rounded-2xl p-12
+            flex items-center gap-8
+            shadow-2xl hover:scale-105 transition
+            w-full max-w-3xl">
+
+            <!-- ICON -->
+            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
+                <img src="https://amanjkn.bpjs-kesehatan.go.id/file?path=/2023/11/30/df06d480-8f5f-11ee-834e-33097b53f624nameFilePeserta-1.png"
+                     class="w-12 h-12">
+            </div>
+
+            <!-- TEXT -->
+            <div class="text-left">
+                <div class="text-2xl font-bold">
+                    Status Peserta Non Aktif
+                </div>
+                <div class="text-base opacity-90 mt-1">
+                    Cek status kepesertaan peserta non aktif
+                </div>
+            </div>
+
+        </button>
+    </div>
+
+    <script>
+        function goStatus() {
+            window.location.href = "search.html";
+        }
+    </script>
+
+</body>
+</html>

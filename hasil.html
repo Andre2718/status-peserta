@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Cek Peserta Non Aktif</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gray-100">
+
+    <!-- HEADER -->
+    <div class="bg-gradient-to-r from-blue-800 to-green-600 py-6 relative">
+        <div class="absolute left-6 top-6">
+            <button onclick="history.back()" class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm">
+                ← Kembali
+            </button>
+        </div>
+
+        <h1 class="text-center text-white text-xl font-semibold">
+            Status Peserta
+        </h1>
+
+        <div class="absolute right-6 top-6">
+            <button onclick="menuUtama()" class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm">
+                Menu Utama
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="resultList" class="max-w-4xl mx-auto mt-8 space-y-6 px-4 pb-10"></div>
+
+    <script>
+        const container = document.getElementById("resultList");
+        const rawData = localStorage.getItem("hasilPeserta");
+
+        // 🔐 Kalau buka langsung tanpa search → balik
+        if (!rawData) {
+            window.location.href = "dashboard.html";
+        }
+
+        const data = JSON.parse(rawData) || [];
+
+        function formatTanggal(tgl) {
+            if (!tgl) return "-";
+
+            // kalau format sudah ISO
+            const d = new Date(tgl);
+            if (!isNaN(d.getTime())) {
+                return d.toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                });
+            }
+
+            return tgl; // fallback kalau format aneh
+        }
+
+        function formatRupiah(angka) {
+            const num = Number(angka);
+            if (isNaN(num)) return "0";
+            return num.toLocaleString("id-ID");
+        }
+
+        if (data.length === 0) {
+            container.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow text-center text-gray-600">
+                    Data tidak tersedia
+                </div>
+            `;
+        }
+
+        data.forEach(p => {
+
+            const bulan = Number(p.jumlah_bulan_non_aktif ?? p.bulan ?? 0);
+            const status = bulan > 0 ? "TIDAK AKTIF" : "AKTIF";
+            const color = status === "AKTIF" ? "text-green-600" : "text-red-600";
+
+            container.innerHTML += `
+                <div class="bg-white rounded-xl shadow p-6 space-y-3">
+
+                    <div class="font-semibold text-lg ${color}">
+                        ${p.nama ?? "-"} (${status})
+                    </div>
+
+                    <div class="text-sm text-gray-600">
+                        Peserta: ${p.segmen ?? "-"}
+                    </div>
+
+                    <div class="text-sm">
+                        <b>Tanggal Non Aktif:</b> ${formatTanggal(p.tgl_nonaktif)}<br>
+                        <b>Jumlah Bulan:</b> ${bulan}
+                    </div>
+
+                    <div class="text-center text-sm font-semibold text-gray-700 mt-4">
+                        Estimasi Iuran Apabila Akan Pindah Ke Segmen Mandiri (Berbayar):
+                    </div>
+
+                    <div class="grid sm:grid-cols-3 gap-3 text-sm mt-3">
+
+                        <div class="border p-3 rounded-lg text-center">
+                            <b>Kelas 1</b><br>
+                            Rp ${formatRupiah(p.kelas_1)}
+                        </div>
+
+                        <div class="border p-3 rounded-lg text-center">
+                            <b>Kelas 2</b><br>
+                            Rp ${formatRupiah(p.kelas_2)}
+                        </div>
+
+                        <div class="border p-3 rounded-lg text-center">
+                            <b>Kelas 3</b><br>
+                            Rp ${formatRupiah(p.kelas_3)}
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        });
+
+        function menuUtama() {
+            localStorage.removeItem("hasilPeserta");
+            window.location.href = "dashboard.html";
+        }
+    </script>
+
+</body>
+
+</html>
