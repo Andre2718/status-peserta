@@ -32,150 +32,98 @@
     <div id="resultList" class="max-w-4xl mx-auto mt-8 space-y-6 px-4 pb-10"></div>
 
     <script>
-        const container = document.getElementById("resultList");
-        const rawData = localStorage.getItem("hasilPeserta");
+    const container = document.getElementById("resultList");
+    const rawData = localStorage.getItem("hasilPeserta");
 
-        // 🔐 Kalau buka langsung tanpa search → balik
-        if (!rawData) {
-            window.location.href = "dashboard.html";
+    if (!rawData) {
+        window.location.href = "dashboard.html";
+    }
+
+    const data = JSON.parse(rawData) || [];
+
+    function formatTanggal(tgl) {
+        if (!tgl) return "-";
+
+        const d = new Date(tgl);
+        if (!isNaN(d.getTime())) {
+            return d.toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric"
+            });
         }
 
-        const data = JSON.parse(rawData) || [];
+        return tgl;
+    }
 
-        function formatTanggal(tgl) {
-            if (!tgl) return "-";
+    function formatRupiah(angka) {
+        const num = Number(angka);
+        if (isNaN(num)) return "0";
+        return num.toLocaleString("id-ID");
+    }
 
-            // kalau format sudah ISO
-            const d = new Date(tgl);
-            if (!isNaN(d.getTime())) {
-                return d.toLocaleDateString("id-ID", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric"
-                });
-            }
-
-            return tgl; // fallback kalau format aneh
-        }
-
-        function formatRupiah(angka) {
-            const num = Number(angka);
-            if (isNaN(num)) return "0";
-            return num.toLocaleString("id-ID");
-        }
-
-        if (data.length === 0) {
-            container.innerHTML = `
-        <div class="bg-white p-6 rounded-xl shadow text-center text-gray-600">
-            Data tidak tersedia
-        </div>
-    `;
-        } else {
-
-            const p = data[0]; // 🔥 ambil 1 data aja
-
-            const bulan = p.jumlah_bulan_non_aktif ?? p.bulan ?? "-";
-
-            const status = "TIDAK AKTIF";
-            const color = "text-red-600";
-
-            container.innerHTML = `
-        <div class="bg-white rounded-xl shadow p-6 space-y-3">
-
-            <div class="font-semibold text-lg ${color}">
-                ${p.nama ?? "-"} (${status})
+    if (data.length === 0) {
+        container.innerHTML = `
+            <div class="bg-white p-6 rounded-xl shadow text-center text-gray-600">
+                Data tidak tersedia
             </div>
+        `;
+    } else {
 
-            <div class="text-sm text-gray-600">
-                Peserta: ${p.segmen ?? "-"}
-            </div>
+        const p = data[0]; // ✅ cuma ambil 1 data
 
-            <div class="text-sm">
-                <b>Tanggal Non Aktif:</b> ${formatTanggal(p.tgl_nonaktif)}<br>
-                <b>Jumlah Bulan:</b> ${bulan}
-            </div>
+        const bulan = p.jumlah_bulan_non_aktif ?? p.bulan ?? "-";
 
-            <div class="text-center text-sm font-semibold text-gray-700 mt-4">
-                Estimasi Iuran Apabila Akan Pindah Ke Segmen Mandiri (Berbayar) Tanpa masa Tunggu 14 Hari:
-            </div>
+        const status = "TIDAK AKTIF";
+        const color = "text-red-600";
 
-            <div class="grid sm:grid-cols-3 gap-3 text-sm mt-3">
+        container.innerHTML = `
+            <div class="bg-white rounded-xl shadow p-6 space-y-3">
 
-                <div class="border p-3 rounded-lg text-center">
-                    <b>Kelas 1</b><br>
-                    Rp ${formatRupiah(p.kelas_1)}
+                <div class="font-semibold text-lg ${color}">
+                    ${p.nama ?? "-"} (${status})
                 </div>
 
-                <div class="border p-3 rounded-lg text-center">
-                    <b>Kelas 2</b><br>
-                    Rp ${formatRupiah(p.kelas_2)}
+                <div class="text-sm text-gray-600">
+                    Peserta: ${p.segmen ?? "-"}
                 </div>
 
-                <div class="border p-3 rounded-lg text-center">
-                    <b>Kelas 3</b><br>
-                    Rp ${formatRupiah(p.kelas_3)}
+                <div class="text-sm">
+                    <b>Tanggal Non Aktif:</b> ${formatTanggal(p.tgl_nonaktif)}<br>
+                    <b>Jumlah Bulan:</b> ${bulan}
                 </div>
 
-            </div>
-        </div>
-    `;
-        }
-
-        data.forEach(p => {
-
-            const bulan = p.jumlah_bulan_non_aktif ?? p.bulan ?? "-";
-
-            // 🔥 HARD FIX: semua tidak aktif
-            const status = "TIDAK AKTIF";
-            const color = "text-red-600";
-
-            container.innerHTML += `
-        <div class="bg-white rounded-xl shadow p-6 space-y-3">
-
-            <div class="font-semibold text-lg ${color}">
-                ${p.nama ?? "-"} (${status})
-            </div>
-
-            <div class="text-sm text-gray-600">
-                Peserta: ${p.segmen ?? "-"}
-            </div>
-
-            <div class="text-sm">
-                <b>Tanggal Non Aktif:</b> ${formatTanggal(p.tgl_nonaktif)}<br>
-                <b>Jumlah Bulan:</b> ${bulan}
-            </div>
-
-            <div class="text-center text-sm font-semibold text-gray-700 mt-4">
-                Estimasi Iuran Apabila Akan Pindah Ke Segmen Mandiri (Berbayar) Tanpa masa Tunggu 14 Hari:
-            </div>
-
-            <div class="grid sm:grid-cols-3 gap-3 text-sm mt-3">
-
-                <div class="border p-3 rounded-lg text-center">
-                    <b>Kelas 1</b><br>
-                    Rp ${formatRupiah(p.kelas_1)}
+                <div class="text-center text-sm font-semibold text-gray-700 mt-4">
+                    Estimasi Iuran Apabila Akan Pindah Ke Segmen Mandiri (Berbayar) Tanpa masa Tunggu 14 Hari:
                 </div>
 
-                <div class="border p-3 rounded-lg text-center">
-                    <b>Kelas 2</b><br>
-                    Rp ${formatRupiah(p.kelas_2)}
-                </div>
+                <div class="grid sm:grid-cols-3 gap-3 text-sm mt-3">
 
-                <div class="border p-3 rounded-lg text-center">
-                    <b>Kelas 3</b><br>
-                    Rp ${formatRupiah(p.kelas_3)}
-                </div>
+                    <div class="border p-3 rounded-lg text-center">
+                        <b>Kelas 1</b><br>
+                        Rp ${formatRupiah(p.kelas_1)}
+                    </div>
 
+                    <div class="border p-3 rounded-lg text-center">
+                        <b>Kelas 2</b><br>
+                        Rp ${formatRupiah(p.kelas_2)}
+                    </div>
+
+                    <div class="border p-3 rounded-lg text-center">
+                        <b>Kelas 3</b><br>
+                        Rp ${formatRupiah(p.kelas_3)}
+                    </div>
+
+                </div>
             </div>
-        </div>
-    `;
-        });
+        `;
+    }
 
-        function menuUtama() {
-            localStorage.removeItem("hasilPeserta");
-            window.location.href = "dashboard.html";
-        }
-    </script>
+    function menuUtama() {
+        localStorage.removeItem("hasilPeserta");
+        window.location.href = "dashboard.html";
+    }
+</script>
 
 </body>
 
