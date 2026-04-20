@@ -74,7 +74,7 @@
 
         data.forEach(p => {
 
-            const bulan = Number(p.jumlah_bulan_non_aktif ?? p.bulan ?? 0);
+            const bulan = p.jumlah_bulan_non_aktif ?? p.bulan ?? "-";
 
             // 🔥 HARD FIX: semua tidak aktif
             const status = "TIDAK AKTIF";
