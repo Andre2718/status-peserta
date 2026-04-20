@@ -75,49 +75,50 @@
         data.forEach(p => {
 
             const bulan = Number(p.jumlah_bulan_non_aktif ?? p.bulan ?? 0);
+
             const status = bulan > 0 ? "TIDAK AKTIF" : "AKTIF";
             const color = status === "AKTIF" ? "text-green-600" : "text-red-600";
 
             container.innerHTML += `
-                <div class="bg-white rounded-xl shadow p-6 space-y-3">
+        <div class="bg-white rounded-xl shadow p-6 space-y-3">
 
-                    <div class="font-semibold text-lg ${color}">
-                        ${p.nama ?? "-"} (${status})
-                    </div>
+            <div class="font-semibold text-lg ${color}">
+                ${p.nama ?? "-"} (${status})
+            </div>
 
-                    <div class="text-sm text-gray-600">
-                        Peserta: ${p.segmen ?? "-"}
-                    </div>
+            <div class="text-sm text-gray-600">
+                Peserta: ${p.segmen ?? "-"}
+            </div>
 
-                    <div class="text-sm">
-                        <b>Tanggal Non Aktif:</b> ${formatTanggal(p.tgl_nonaktif)}<br>
-                        <b>Jumlah Bulan:</b> ${bulan}
-                    </div>
+            <div class="text-sm">
+                <b>Tanggal Non Aktif:</b> ${formatTanggal(p.tgl_nonaktif)}<br>
+                <b>Jumlah Bulan:</b> ${bulan}
+            </div>
 
-                    <div class="text-center text-sm font-semibold text-gray-700 mt-4">
-                        Estimasi Iuran Apabila Akan Pindah Ke Segmen Mandiri (Berbayar) Tanpa masa Tunggu 14 Hari:
-                    </div>
+            <div class="text-center text-sm font-semibold text-gray-700 mt-4">
+                Estimasi Iuran Apabila Akan Pindah Ke Segmen Mandiri (Berbayar) Tanpa masa Tunggu 14 Hari:
+            </div>
 
-                    <div class="grid sm:grid-cols-3 gap-3 text-sm mt-3">
+            <div class="grid sm:grid-cols-3 gap-3 text-sm mt-3">
 
-                        <div class="border p-3 rounded-lg text-center">
-                            <b>Kelas 1</b><br>
-                            Rp ${formatRupiah(p.kelas_1)}
-                        </div>
-
-                        <div class="border p-3 rounded-lg text-center">
-                            <b>Kelas 2</b><br>
-                            Rp ${formatRupiah(p.kelas_2)}
-                        </div>
-
-                        <div class="border p-3 rounded-lg text-center">
-                            <b>Kelas 3</b><br>
-                            Rp ${formatRupiah(p.kelas_3)}
-                        </div>
-
-                    </div>
+                <div class="border p-3 rounded-lg text-center">
+                    <b>Kelas 1</b><br>
+                    Rp ${formatRupiah(p.kelas_1)}
                 </div>
-            `;
+
+                <div class="border p-3 rounded-lg text-center">
+                    <b>Kelas 2</b><br>
+                    Rp ${formatRupiah(p.kelas_2)}
+                </div>
+
+                <div class="border p-3 rounded-lg text-center">
+                    <b>Kelas 3</b><br>
+                    Rp ${formatRupiah(p.kelas_3)}
+                </div>
+
+            </div>
+        </div>
+    `;
         });
 
         function menuUtama() {
