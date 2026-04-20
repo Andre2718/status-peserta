@@ -76,7 +76,17 @@
 
             const bulan = Number(p.jumlah_bulan_non_aktif ?? p.bulan ?? 0);
 
-            const status = bulan > 0 ? "TIDAK AKTIF" : "AKTIF";
+            const today = new Date();
+            let status = "AKTIF";
+
+            if (p.tgl_nonaktif) {
+                const tglNonaktif = new Date(p.tgl_nonaktif);
+
+                if (!isNaN(tglNonaktif.getTime()) && today >= tglNonaktif) {
+                    status = "TIDAK AKTIF";
+                }
+            }
+
             const color = status === "AKTIF" ? "text-green-600" : "text-red-600";
 
             container.innerHTML += `
