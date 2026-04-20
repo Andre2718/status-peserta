@@ -75,12 +75,12 @@
         data.forEach(p => {
 
             const today = new Date();
-            const tglNonaktif = new Date(p.tgl_nonaktif);
-
             let status = "AKTIF";
 
-            if (!isNaN(tglNonaktif.getTime())) {
-                if (today >= tglNonaktif) {
+            if (p.tgl_nonaktif) {
+                const tglNonaktif = new Date(p.tgl_nonaktif);
+
+                if (!isNaN(tglNonaktif.getTime()) && today >= tglNonaktif) {
                     status = "TIDAK AKTIF";
                 }
             }
